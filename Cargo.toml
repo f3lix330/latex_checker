@@ -1,9 +1,12 @@
 [package]
 name = "latex_checker"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2024"
 
 [dependencies]
 walkdir = "2.5.0"
 regex = "1.11.1"
 colored="3.0.0"
+
+[target.'cfg(windows)'.dependencies]
+winapi-util = "0.1"
