@@ -1,6 +1,6 @@
 # Latex Checker
 
-Checks every .tex file in a directory (incl. sub-directories) for capitalized words that should be in glossary.
+Checks every .tex file in a directory (incl. sub-directories) for capitalized words that should be in the glossary.
 
 ## Usage
 ```
