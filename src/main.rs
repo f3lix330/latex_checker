@@ -20,7 +20,7 @@ fn enable_virtual_terminal_processing() {
 fn main() {
     #[cfg(windows)]
     enable_virtual_terminal_processing();
-    
+
     match env::args().nth(1) {
         Some(wd) => {
             let files = get_all_files(PathBuf::from(wd));
@@ -31,8 +31,8 @@ fn main() {
                         let result = read_file(&file);
                         match result {
                             Err(lines) => {
-                                for line in lines {
-                                    println!("{}", line.yellow());
+                                for (i, line) in lines {
+                                    println!("{}{} {}",i.to_string().yellow(), ":".yellow(), line.yellow());
                                 }
                             }
                             Ok(err) => {
@@ -55,7 +55,7 @@ fn main() {
 fn get_all_files<'a>(path: PathBuf) -> Result<Vec<PathBuf>, String> {
     let mut file_paths: Vec<PathBuf> = Vec::new();
     for entry in WalkDir::new(path)
-        .sort_by(|a, b| a.file_name().cmp(b.file_name()))
+        .sort_by(|a, b| b.file_name().cmp(a.file_name()))
         .into_iter()
         .filter_map(|e| e.ok())
     {
@@ -76,8 +76,8 @@ fn get_all_files<'a>(path: PathBuf) -> Result<Vec<PathBuf>, String> {
     }
 }
 
-fn read_file(path: &PathBuf) -> Result<String, Vec<String>> {
-    let mut faulty_lines: Vec<String> = Vec::new();
+fn read_file(path: &PathBuf) -> Result<String, Vec<(usize, String)>> {
+    let mut faulty_lines: HashMap<usize, String> = HashMap::new();
     let file = fs::read_to_string(path);
     let re = Regex::new(r"\b\p{Lu}+\b").unwrap();
     match file {
@@ -88,7 +88,7 @@ fn read_file(path: &PathBuf) -> Result<String, Vec<String>> {
             }
             for (i, line) in lines.iter() {
                 for cap in re.find_iter(line) {
-                    faulty_lines.push(format!("{}: {}", i, cap.as_str()));
+                    faulty_lines.insert(*i, cap.as_str().to_string());
                 }
             }
         }
@@ -100,8 +100,9 @@ fn read_file(path: &PathBuf) -> Result<String, Vec<String>> {
     if faulty_lines.is_empty() {
         Ok(format!("No faulty lines found in {}", get_file_name(&path)).to_string())
     } else {
-        faulty_lines.sort();
-        Err(faulty_lines)
+        let mut sorted: Vec<(usize, String)> = faulty_lines.iter().map(|(&k, v)| (k, v.clone())).collect();
+        sorted.sort_by_key(|(key, _)| *key);
+        Err(sorted)
     }
 }
 
