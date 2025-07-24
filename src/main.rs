@@ -85,7 +85,7 @@ fn read_file(path: &PathBuf, allowed: &Vec<String>) -> Result<String, Vec<(usize
         Ok(file) => {
             let mut lines: HashMap<usize, String> = HashMap::new();
             for (i, line) in file.lines().enumerate() {
-                lines.insert(i, line.to_string());
+                lines.insert(i + 1, line.to_string());
             }
             for (i, line) in lines.iter() {
                 for cap in re.find_iter(line) {
