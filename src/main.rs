@@ -91,7 +91,7 @@ fn read_file(path: &PathBuf, allowed: &Vec<String>) -> Result<String, Vec<(usize
                 for cap in re.find_iter(line) {
                     let acronym = cap.as_str().to_string();
                     if acronym.len() >= 2 && !allowed.contains(&acronym){
-                        faulty_lines.insert(*i, acronym);
+                        faulty_lines.insert(i + 1, acronym);
                     }
                 }
             }
